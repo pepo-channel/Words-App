@@ -5,13 +5,14 @@ import 'package:word_app/core/consts.dart';
 import 'package:word_app/cubits/read%20cubit/cubit/read_word_cubit.dart';
 import 'package:word_app/cubits/write%20cubit/cubit/write_word_cubit.dart';
 import 'package:word_app/features/home/screens/home_screen.dart';
+import 'package:word_app/models/word_model.dart';
 import 'package:word_app/models/word_typeadapter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(WordTypeadapter());
-  await Hive.openBox(kHiveBox);
+  await Hive.openBox<List<WordModel>>(kHiveBox);
   runApp(const WordApp());
 }
 

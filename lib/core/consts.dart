@@ -10,5 +10,5 @@ abstract class colorsdata {
   static const YellowColor = Color(0xfffbc117);
   static const RedColor = Color(0xffc3441d);
   static const BlueColor = Color(0xff9cdcfe);
-  static const ButtonColor = Color(0xff546e7a);
+  static const ButtonColor = Color(0xFF28B5F6);
 }

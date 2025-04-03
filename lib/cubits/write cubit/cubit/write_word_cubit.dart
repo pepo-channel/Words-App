@@ -8,7 +8,7 @@ part 'write_word_state.dart';
 
 class WriteWordCubit extends Cubit<WriteWordState> {
   WriteWordCubit() : super(WriteWordInitial());
-  static get(context) => BlocProvider.of(context); // to get access
+  static WriteWordCubit get(context) => BlocProvider.of(context); // to get access
 
   final Box<List<WordModel>> _box = Hive.box(kHiveBox);
 
@@ -22,10 +22,12 @@ class WriteWordCubit extends Cubit<WriteWordState> {
 
   UpdateIsArabic(bool isArabic){
     this.isArabic = isArabic;
+    emit(WriteWordInitial());
   }
 
   UpdateColorCode(int colorcode){
     this.colorcode = colorcode;
+    emit(WriteWordInitial());
   }
 
 
@@ -114,5 +116,5 @@ class WriteWordCubit extends Cubit<WriteWordState> {
     }
   }
 
-  _GetListFromBox() =>List.from(_box.get(kListWrods, defaultValue: [])!).cast<WordModel>();
+  _GetListFromBox() =>List<WordModel>.from(_box.get(kListWrods, defaultValue: [])!.cast<WordModel>()).cast<WordModel>();
 }

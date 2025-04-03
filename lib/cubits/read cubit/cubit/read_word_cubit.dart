@@ -7,7 +7,7 @@ part 'read_word_state.dart';
 
 class ReadWordCubit extends Cubit<ReadWordState> {
   ReadWordCubit() : super(ReadWordInitial());
-  static get(context) => BlocProvider.of(context); // to get access
+  static ReadWordCubit get(context) => BlocProvider.of(context); // to get access
   
   final Box<List<WordModel>> _box = Hive.box(kHiveBox);
 
