@@ -30,6 +30,14 @@ class WordApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: colorsdata.BaisicColor,
+          primaryTextTheme: TextTheme(
+            bodyLarge: TextStyle(color: colorsdata.WhiteColor, fontWeight: FontWeight.bold, fontSize: 25,),
+            bodyMedium: TextStyle(color: colorsdata.WhiteColor, fontWeight: FontWeight.w500, fontSize: 20,),
+          ),
+        ),
         home: HomeScreen(),
       ),
     );

@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meta/meta.dart';
@@ -10,7 +9,7 @@ class ReadWordCubit extends Cubit<ReadWordState> {
   ReadWordCubit() : super(ReadWordInitial());
   static get(context) => BlocProvider.of(context); // to get access
   
-  Box<List<WordModel>> _box = Hive.box(kHiveBox);
+  final Box<List<WordModel>> _box = Hive.box(kHiveBox);
 
   LanguageFilter languageFilter = LanguageFilter.AllWords;
   SortedBy sortedBy = SortedBy.Time;

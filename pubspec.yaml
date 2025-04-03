@@ -33,6 +33,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.0
   hive_flutter: ^1.1.0
+  meta: ^1.16.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0

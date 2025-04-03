@@ -1,10 +1,6 @@
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
-
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:meta/meta.dart';
 import 'package:word_app/core/consts.dart';
 import 'package:word_app/models/word_model.dart';
 
@@ -14,7 +10,7 @@ class WriteWordCubit extends Cubit<WriteWordState> {
   WriteWordCubit() : super(WriteWordInitial());
   static get(context) => BlocProvider.of(context); // to get access
 
-  Box<List<WordModel>> _box = Hive.box(kHiveBox);
+  final Box<List<WordModel>> _box = Hive.box(kHiveBox);
 
   String text = '';
   bool isArabic = true;
@@ -110,11 +106,11 @@ class WriteWordCubit extends Cubit<WriteWordState> {
   _TryAndCatch({required VoidCallback? function, required String? errmsg, required List<WordModel> words}){
     emit(WriteWordLoading());
     try {
-      function.call();
+      function?.call();
       _box.put(kListWrods, words);
       emit(WriteWordSuccess());
     } catch (e) {
-      emit(WriteWordFailed(message: 'there is a problem when ${errmsg}'));
+      emit(WriteWordFailed(message: 'there is a problem when $errmsg'));
     }
   }
 
