@@ -10,11 +10,11 @@ class WriteWordCubit extends Cubit<WriteWordState> {
   WriteWordCubit() : super(WriteWordInitial());
   static WriteWordCubit get(context) => BlocProvider.of(context); // to get access
 
-  final Box<List<WordModel>> _box = Hive.box(kHiveBox);
+  final Box _box = Hive.box(kHiveBox);
 
   String text = '';
   bool isArabic = true;
-  int colorcode = 0XFF1f1f1f;
+  int colorcode = 0xFF1E1E1E;
 
   UpdateText(String text){
     this.text = text;
@@ -61,13 +61,13 @@ class WriteWordCubit extends Cubit<WriteWordState> {
     );
   }
 
-  AddSimilarWrod(int indexAtdata){
+  AddSimilarWrod(int indexAtdata, bool isArabicSimilarWord){
     List<WordModel> words = _GetListFromBox();
     _TryAndCatch(
       words: words,
       errmsg: 'add this similar word',
       function: () {
-        words[indexAtdata] = words[indexAtdata].AddSimilarWrod(isArabic, text);
+        words[indexAtdata] = words[indexAtdata].AddSimilarWrod(isArabicSimilarWord, text);
       },
     );
   }
@@ -83,7 +83,7 @@ class WriteWordCubit extends Cubit<WriteWordState> {
     );
   }
 
-  AddExample(int indexAtdata, int IndexAtExamples, bool isArabicExample){
+  AddExample(int indexAtdata, bool isArabicExample){
     List<WordModel> words = _GetListFromBox();
     _TryAndCatch(
       words: words,
@@ -116,5 +116,5 @@ class WriteWordCubit extends Cubit<WriteWordState> {
     }
   }
 
-  _GetListFromBox() =>List<WordModel>.from(_box.get(kListWrods, defaultValue: [])!.cast<WordModel>()).cast<WordModel>();
+  _GetListFromBox() =>List<WordModel>.from(_box.get(kListWrods, defaultValue: [])!).cast<WordModel>();
 }

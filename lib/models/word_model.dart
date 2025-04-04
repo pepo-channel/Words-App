@@ -86,7 +86,7 @@ class WordModel {
     List<String> newExamples = _get_initialize_example_word(isArabicExample);
     newExamples.removeAt(indexAtExamples);
 
-    return WordModel(indexAtdata: indexAtdata, text: text, colorcode: colorcode, isArabic: isArabic);
+    return _get_word_after_check_example(isArabicExample, newExamples);
   }
 
   WordModel get_words_after_decrement (){

@@ -6,16 +6,25 @@ import 'package:word_app/cubits/write%20cubit/cubit/write_word_cubit.dart';
 import 'package:word_app/features/home/widgets/Languages_widget.dart';
 import 'package:word_app/features/home/widgets/colors_widget.dart';
 import 'package:word_app/features/home/widgets/form_widget.dart';
-import 'package:word_app/models/word_model.dart';
+import 'package:word_app/features/home/widgets/grid_texts.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final TextEditingController _text = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _appbar(),
+        appBar: _appbar(context),
         floatingActionButton: _FloatingActionButton(context),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -58,11 +67,26 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              LanguagesWidget(),
+              LanguagesWidget(textcolor: Color(WriteWordCubit.get(context).colorcode),),
               SizedBox(height: 10),
               ColorsWidget(),
               SizedBox(height: 10),
-              FormWidget(),
+              FormWidget(
+                donetextcolor: WriteWordCubit.get(context).colorcode,
+                formkey: _formkey,
+                text: _text,
+                Ontap: (){
+                  if(_formkey.currentState?.validate() == true){
+                    WriteWordCubit.get(context).UpdateText(_text.text);
+                    WriteWordCubit.get(context).AddWord();
+                    ReadWordCubit.get(context).GetWords();
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Success')),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         );
@@ -70,123 +94,184 @@ class HomeScreen extends StatelessWidget {
     ),
   );
 
-  AppBar _appbar() {
+  AppBar _appbar(context) {
     return AppBar(
       toolbarHeight: 80,
       backgroundColor: colorsdata.BaisicColor,
       title: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(color: colorsdata.WhiteColor, width: 2),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'All Words',
-              style: TextStyle(
-                color: colorsdata.WhiteColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                //
-              },
-              child: Container(
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: colorsdata.ButtonColor,
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.sort_by_alpha,
+        child: BlocBuilder<ReadWordCubit, ReadWordState>(
+          builder: (context, state) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  ReadWordCubit.get(
+                    context,
+                  ).languageFilter.name, // deal with this
+                  style: TextStyle(
                     color: colorsdata.WhiteColor,
-                    size: 30,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
                   ),
                 ),
-              ),
-            ),
-          ],
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _Filter_Dialog(context),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: colorsdata.ButtonColor,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.sort_by_alpha,
+                        color: colorsdata.WhiteColor,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
-}
 
-class GridTexts extends StatelessWidget {
-  const GridTexts({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    late List words = [];
-    return BlocBuilder<ReadWordCubit, ReadWordState>(
+  Dialog _Filter_Dialog(context) => Dialog(
+    child: BlocBuilder<ReadWordCubit, ReadWordState>(
       builder: (context, state) {
-        if(state is ReadWordInitial){
-          
-        }
-        else if(state is ReadWordLoading){
-
-        }
-        else if(state is ReadWordSuccess){
-          words = List.from(state.words);
-        }
-        else if(state is ReadWordFailed){
-          _Failed_Method(state);
-        }
-        print(words);
-        return Expanded(
-          child: GridView.builder(
-            itemCount: words.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) => _wordItem(words[index]),
+        return Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colorsdata.BaisicColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _Label_text('Language'),
+              SizedBox(height: 5),
+              _Button_Method(
+                labels: ['Arabic', 'English', 'All'],
+                isactive: [
+                  ReadWordCubit.get(context).languageFilter ==
+                      LanguageFilter.ArabicOnly,
+                  ReadWordCubit.get(context).languageFilter ==
+                      LanguageFilter.EnglishOnly,
+                  ReadWordCubit.get(context).languageFilter ==
+                      LanguageFilter.AllWords,
+                ],
+                ontaps: [
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateLanguageFilter(LanguageFilter.ArabicOnly),
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateLanguageFilter(LanguageFilter.EnglishOnly),
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateLanguageFilter(LanguageFilter.AllWords),
+                ],
+              ),
+              SizedBox(height: 15),
+              _Label_text('Sorted By'),
+              SizedBox(height: 5),
+              _Button_Method(
+                labels: ['Time', 'Word Length'],
+                isactive: [
+                  ReadWordCubit.get(context).sortedBy == SortedBy.Time,
+                  ReadWordCubit.get(context).sortedBy == SortedBy.TextLength,
+                ],
+                ontaps: [
+                  () =>
+                      ReadWordCubit.get(context).UpdateStoredBy(SortedBy.Time),
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateStoredBy(SortedBy.TextLength),
+                ],
+              ),
+              SizedBox(height: 15),
+              _Label_text('Sorting type'),
+              SizedBox(height: 5),
+              _Button_Method(
+                labels: ['Ascending', 'Descending'],
+                isactive: [
+                  ReadWordCubit.get(context).sortingType ==
+                      SortingType.accending,
+                  ReadWordCubit.get(context).sortingType ==
+                      SortingType.deaccending,
+                ],
+                ontaps: [
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateSortingType(SortingType.accending),
+                  () => ReadWordCubit.get(
+                    context,
+                  ).UpdateSortingType(SortingType.deaccending),
+                ],
+              ),
+            ],
           ),
         );
       },
+    ),
+  );
+
+  Widget _Button_Method({
+    required List<String> labels,
+    required List<bool> isactive,
+    required List<void Function()?> ontaps,
+  }) {
+    return Row(
+      children: [
+        for (var i = 0; i < labels.length; i++)
+          InkWell(
+            onTap: ontaps[i],
+            child: Container(
+              margin: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isactive[i] ? colorsdata.WhiteColor : Colors.transparent,
+                border: Border.all(color: colorsdata.WhiteColor, width: 2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                labels[i],
+                style: TextStyle(
+                  color:
+                      isactive[i]
+                          ? colorsdata.BaisicColor
+                          : colorsdata.WhiteColor,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
-  Column _Failed_Method(ReadWordFailed state) {
-    return Column(
-          children: [
-            Icon(Icons.report_problem_sharp, size: 30,),
-            SizedBox(height: 10,),
-            Text(
-              state.errormsg,
-              style: TextStyle(
-                color: colorsdata.WhiteColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        );
-  }
-
-  Widget _wordItem(WordModel word) => Container(
-    padding: EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: colorsdata.RedColor,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Center(
-      child: Text(
-        word.text,
-        style: TextStyle(
-          color: Color(word.colorcode),
-          fontWeight: FontWeight.bold,
-          fontSize: 22,
-        ),
+  Text _Label_text(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: colorsdata.WhiteColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 22,
       ),
-    ),
-  );
-  
+    );
+  }
 }

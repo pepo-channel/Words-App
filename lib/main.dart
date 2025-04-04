@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show BlocProvider, MultiBlocProvider;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:word_app/core/consts.dart';
 import 'package:word_app/cubits/read%20cubit/cubit/read_word_cubit.dart';
 import 'package:word_app/cubits/write%20cubit/cubit/write_word_cubit.dart';
 import 'package:word_app/features/home/screens/home_screen.dart';
-import 'package:word_app/models/word_model.dart';
 import 'package:word_app/models/word_typeadapter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(WordTypeadapter());
-  await Hive.openBox<List<WordModel>>(kHiveBox);
+  await Hive.openBox(kHiveBox);
   runApp(const WordApp());
 }
 
@@ -24,7 +24,7 @@ class WordApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ReadWordCubit(),
+          create: (context) => ReadWordCubit()..GetWords(), // take the words when app opned
         ),
         BlocProvider(
           create: (context) => WriteWordCubit(),

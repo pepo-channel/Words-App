@@ -9,7 +9,7 @@ class ReadWordCubit extends Cubit<ReadWordState> {
   ReadWordCubit() : super(ReadWordInitial());
   static ReadWordCubit get(context) => BlocProvider.of(context); // to get access
   
-  final Box<List<WordModel>> _box = Hive.box(kHiveBox);
+  final Box _box = Hive.box(kHiveBox);
 
   LanguageFilter languageFilter = LanguageFilter.AllWords;
   SortedBy sortedBy = SortedBy.Time;
@@ -17,14 +17,17 @@ class ReadWordCubit extends Cubit<ReadWordState> {
 
   UpdateLanguageFilter(LanguageFilter languageFilter){
     this.languageFilter = languageFilter;
+    GetWords();
   }
 
   UpdateStoredBy(SortedBy sortedBy){
     this.sortedBy = sortedBy;
+    GetWords();
   }
 
   UpdateSortingType(SortingType sortingType){
     this.sortingType = sortingType;
+    GetWords();
   }
 
   GetWords(){
